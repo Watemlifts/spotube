@@ -1,0 +1,228 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+
+# ******** NOTE ********
+# We have attempted to detect the languages in your repository. Please check
+# the `language` matrix defined below to confirm you have the correct set of
+# supported CodeQL languages.
+
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: '24 21 * * 6'
+
+jobs:
+  analyze:
+    name: Analyze
+    # Runner size impacts CodeQL analysis time. To learn more, please see:
+    #   - https://gh.io/recommended-hardware-resources-for-running-codeql
+    #   - https://gh.io/supported-runners-and-hardware-resources
+    #   - https://gh.io/using-larger-runners
+    # Consider using larger runners for possible analysis time improvements.
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'c-cpp', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift' ]
+        # CodeQL supports [ 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift' ]
+        # Use only 'java-kotlin' to analyze code written in Java, Kotlin or both
+        # Use only 'javascript-typescript' to analyze code written in JavaScript, TypeScript or both
+        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        # If you wish to specify custom queries, you can do so here or in a config file.
+        # By default, queries listed here will override any specified in a config file.
+        # Prefix the list here with "+" to use these queries and those in the config file.
+
+        # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
+        # queries: security-extended,security-and-quality
+
+
+    # Autobuild attempts to build any compiled languages (C/C++, C#, Go, Java, or Swift).
+    # If this step fails, then you should remove it and run the build manually (see below)
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+
+    # ℹ️ Command-line programs to run using the OS shell.
+    # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+
+    #   If the Autobuild fails above, remove it and uncomment the following three lines.
+    #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
+
+    # - run: |
+    #     echo "Run, Build Application using script"
+    #     ./location_of_script_within_repo/buildscript.sh
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+       # category: "/language:${{matrix.language}}"
+        
+    - name: SecureStack Application Composition Analysis
+  # You may pin to the exact commit or the version.
+  # uses: SecureStackCo/actions-code@c2c35840882d041474c505c1045da157025cd57e
+  uses: SecureStackCo/actions-code@v0.1.1
+  with:
+    # SecureStack API key - generate an API key at https://app.securestack.com
+    securestack_api_key: 
+    # SecureStack Application ID - can be retrieved by accessing required application at https://app.securestack.com
+    securestack_app_id: 
+    # Severities lower than this value will be reported in the workflow console but will not cause an error for the action; value should be one of: critical | high | medium | low
+    severity: 
+    # Severities lower than this value will be reported in the workflow console but will not cause an error for the action; value should be one of: critical | high | medium | low
+    language: 
+    # Optional flags for the bloodhound-cli code command - run bloodhound cli code --help for more details
+    flags: # optional, default is 
+          
+            - name: Autify for Mobile Run Test Plan
+  # You may pin to the exact commit or the version.
+  # uses: autifyhq/mobile-run-test-plan-action@40bebde5f60117ec81312051028d22238649d280
+uses: autifyhq/mobile-run-test-plan-action@v1.0.0
+with:
+    # Personal Access Token
+    autify_for_mobile_api_token: 
+    # Test Plan ID that you want to run
+    test_plan_id: 
+    # Build ID that you want to use
+    build_id: 
+    # Test Plan API base URL
+    test_plan_api_base_url: # optional, default is https://mobile-app.autify.com/api/v1/test_plans/
+          
+            - name: Xanitizer Security Analysis
+  # You may pin to the exact commit or the version.
+  # uses: RIGS-IT/xanitizer-action@87d13138fb113b727cbe040c744a15a2b4fe5316
+  uses: RIGS-IT/xanitizer-action@v1.0.1
+  with:
+    # String which is used as input for a Xanitizer license file. Note: It is recommended to use a GitHub secret to store the license file content like XANITIZER_LICENSE and access the content in the configuration via the GitHub secret parameter. Please see https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets for details. Note: If the license is a floating license and a proxy server is used to access the license server, please specify the proxy server settings. If no settings are specified, the settings from the Xanitizer properties file will be used.
+    license: # optional
+    # Number of attempts to get a license token from the license server. Note: If the used Xanitizer license is a machine bound license, this parameter will be ignored. If the used Xanitizer license is a floating license it may happen that all tokens are in use or the connection to the license server is not available at startup. In such cases, no license token can be requested successfully from the license server to start Xanitizer and the headless process would terminate with a license error. When this parameter is set to a value greater than zero, Xanitizer attempts every minute to request a license token until the specified count has been reached. Setting this parameter to zero disables the repetition.
+    licenseServerRetryCount: # optional
+    # Relative path under $GITHUB_WORKSPACE where the project was checked out. Note: Please use the same value as for parameter `path` of the configured actions/checkout action (see https://github.com/actions/checkout#usage parameter `path`).
+    checkoutPath: # optional
+    # The output location of the overview report. This has to be either a list of files or the parameter has to be undefined or empty if no overview reports should be written. Allowed file extensions are: pdf, html, docx.
+    overviewReportOutputFile: # optional
+    # Comma separated list of output locations of the overview reports. This has to be either a list of files or the parameter has to be undefined or empty if no overview reports should be written. Allowed file extensions are: pdf, html, docx.
+    overviewReportOutputFiles: # optional
+    # The output location of the findings list report. This has to be either a list of files or the parameter has to be undefined or empty if no findings list reports should be written. Allowed file extensions are: pdf, html, docx, xml, csv, sarif.
+    findingsListReportOutputFile: # optional
+    # Comma separated list of output locations of the findings list reports. This has to be either a list of files or the parameter has to be undefined or empty if no findings list reports should be written. Allowed file extensions are: pdf, html, docx, xml, csv, sarif. Note: If no report file has been secified, i.e., neither an overview report nor a findings list report, both a Xanitizer-Findings-List.pdf and a Xanitizer-Findings-List.sarif report will be generated in the checkout directory specified by $GITHUB_WORKSPACE with the optional relative parameter `checkoutPath` as default.
+    findingsListReportOutputFiles: # optional
+    # Boolean flag specifying if only findings with problem classifications are written to the findings list report.
+    onlyProblemsInFindingsListReport: # optional, default is true
+    # Boolean flag specifying if all the details of a finding are written to the findings list report, e.g. if the output contains all steps of a path. Note: Only relevant if the file extension of the parameter `findingsListReportOutputFile` is xml, html, or sarif.
+    generateDetailsInFindingsListReport: # optional, default is true
+    # The path to the Xanitizer configuration file of the project that should be analyzed. Either this parameter or the parameter `rootDirectory` may be specified, but not both. Note: If neither the parameter `configFile` nor the parameter `rootDirectory` has been specified, the parameter `rootDirectory` is set to the checkout directory specified by $GITHUB_WORKSPACE with the optional relative parameter `checkoutPath`.
+    configFile: # optional
+    # The root directory, to be used for default set-ups. Either this parameter or the parameter `configFile` may be specified, but not both. Note: If neither the parameter `configFile` nor the parameter `rootDirectory` has been specified, the parameter `rootDirectory` is set to the checkout directory specified by $GITHUB_WORKSPACE with the optional relative parameter `checkoutPath`.
+    rootDirectory: # optional
+    # The project name that should be used. Only relevant if the parameter `rootDirectory` is specified. If not given, the simple name of the root directory is used.
+    projectName: # optional
+    # The directory where to put the generated configuration file. Only relevant if the parameter `rootDirectory` is specified. If not given, the configuration file is generated in the `rootDirectory`.
+    configFileDirectory: # optional
+    # Boolean flag specifying if an existing config file is to be overwritten. Only relevant if the parameter `rootDirectory` is specified.
+    overwriteConfigFile: # optional
+    # Boolean flag specifying whether Xanitizer uses NodeJS to compile Angular and TypeScript projects to JavaScript code itself or not. This could be a potential risk if someone has manipulated the external ng or the tsc script. If the code is already compiled to JavaScript, best with a source map, this option can be set to `false` true - enables the compilation of Angular and TypeScript code to JavaScript by Xanitizer itself false - disables the compilation of Angular and TypeScript code to JavaScript by Xanitizer itself and some Xanitizer workspace information will be generated if Angular or Typescript files are found in the project not set - if this option is not set and Angular or Typescript files are found in the project, a Xanitizer workspace error will be generated 
+    compileToJavaScript: # optional, default is true
+    # Boolean flag specifying if npm audit should be executed. The npm audit APIs can be used to report on known vulnerable node.js libraries. This requires an Internet connection and so has to be allowed explicitly. This is only relevant for NodeJS projects.
+    performNodeAudit: # optional, default is true
+    # Boolean flag specifying whether the task should fail if there are search paths configured that do not exist.
+    haltOnMissingSearchPaths: # optional
+    # A comma - separated list of issue groups that will let the task fail if for any of them, a Xanitizer error issue occurs. Possible values are ALL_ERRORS, WORKSPACE_ERRORS, CALL_GRAPH_ERRORS, ANALYSIS_ERRORS, MIGRATION_ERRORS. If the value is not set, this means that issues are not relevant for the success of the task.
+    haltOnIssues: # optional
+    # Boolean flag specifying whether the task should fail if there are findings with a rating equal or higher than the value defined for `findingsRatingThreshold`.
+    haltOnFindings: # optional
+    # A rating value. Only used if the parameter `haltOnFindings` is set.
+    findingsRatingThreshold: # optional
+    # Boolean flag specifying whether the OWASP Dependency Check repository should be updated or not. Note: The OWASP Dependency Check is based on vulnerability data stored in a local repository. It is recommended to update the local OWASP Dependency Check repository on a regular basis via remote access to the National Vulnerability Database (NIST). If a proxy server is used to access the internet, please specify the proxy server settings otherwise the settings from the Xanitizer properties file will be used.
+    updateOwaspDependencyCheckRepository: # optional
+    # The logging level to be used when running Xanitizer. Values: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL.
+    logLevel: # optional
+    # Xanitizer`s project data directory, if it is not the default one in <HOME>/.Xanitizer.
+    projectDataDirectory: # optional
+    # Boolean flag specifying whether the task should fail if there are * NEW * findings with a rating equal or higher than the value defined for `newFindingsRating`.
+    haltOnNewFindings: # optional
+    # A rating value. Only used if the parameter `haltOnNewFindings` is set.
+    newFindingsRatingThreshold: # optional
+    # Optional path to the local Maven repository. Note: If no settings are specified, the settings from the Xanitizer properties file will be used.
+    mavenRepository: # optional
+    # Boolean flag specifying whether a snapshot should be created after parsing and analyzing the current version or not.
+    createSnapshot: # optional
+    # Optional comment added to the newly created snapshot. Only relevant if the parameter `createSnapshot` is true.
+    snapshotComment: # optional
+    # The output directory of the project export. Note: If the parameter is undefined or an empty string, the project is not exported.
+    exportDirectory: # optional
+    # Boolean flag specifying if snapshots should be exported or not. The parameter is only used if an export directory is set. If the parameter is not set or empty, no snapshots are exported.
+    exportSnapshots: # optional
+    # The passphrase for the project export. The parameter is only used if an export directory is set. If the parameter is not set or empty, the exported project is not encrypted. Note: It is recommended to use a GitHub secret to store the export like XANITIZER_EXPORT_PASSPHRASE and access the content in the configuration via the GitHub secret parameter. Please see https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets for details.
+    exportPassphrase: # optional
+    # The path to an exported Xanitizer project archive file. If specified, this project is merged into the current project. This means that all more recent user adaptations, findings and issues are migrated into the current project.
+    mergedProject: # optional
+    # The passphrase for the merged project. The parameter is only necessary if the parameter `mergedProject` is set and the merged project is encrypted. Note: It is recommended to use a GitHub secret to store the export passphrase like XANITIZER_EXPORT_PASSPHRASE. and access the content in the configuration via the GitHub secret parameter. Please see https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets for details.
+    importPassphrase: # optional
+    # Optional proxy server to access the internet to update the OWASP Dependency Check repository or to request a license token from the public license server in case of a floating license via a proxy. Note: If no settings are specified, the settings from the Xanitizer properties file will be used.
+    proxyServer: # optional
+    # Optional proxy server port.
+    proxyPort: # optional
+    # Optional proxy server user name.
+    proxyUser: # optional
+    # Optional proxy server user password.
+    proxyPassword: # optional
+          
+            - name: elmah.io Create Deployment Action
+  # You may pin to the exact commit or the version.
+  # uses: elmahio/github-create-deployment-action@132611db9161ecebb1b07db6510d4ea5e0d2d415
+  uses: elmahio/github-create-deployment-action@v1
+  with:
+    # An API key with permission to create deployments.
+    apiKey: 
+    # The version number of this deployment. The value of version can be a SemVer compliant string or any other syntax that you are using as your version numbering scheme.
+    version: 
+    # Optional description of this deployment. Can be markdown or clear text.
+    description: # optional
+    # The name of the person responsible for creating this deployment. This can be the name taken from your deployment server.
+    userName: # optional
+    # The email of the person responsible for creating this deployment. This can be the email taken from your deployment server.
+    userEmail: # optional
+    # As default, deployments are attached all logs of the organization. If you want a deployment to attach to a single log only, set this to the ID of that log.
+    logId: # optional
+          
+            - name: Cache
+  uses: actions/cache@v3.3.2
+  with:
+    # A list of files, directories, and wildcard patterns to cache and restore
+    path: 
+    # An explicit key for restoring and saving the cache
+    key: 
+    # An ordered list of keys to use for restoring stale cache if no cache hit occurred for key. Note `cache-hit` returns false in this case.
+    restore-keys: # optional
+    # The chunk size used to split up large files during upload, in bytes
+    upload-chunk-size: # optional
+    # An optional boolean when enabled, allows windows runners to save or restore caches that can be restored or saved respectively on other platforms
+    enableCrossOsArchive: # optional, default is false
+    # Fail the workflow if cache entry is not found
+    fail-on-cache-miss: # optional, default is false
+    # Check if a cache entry exists for the given input(s) (key, restore-keys) without downloading the cache
+    lookup-only: # optional, default is false
+          
